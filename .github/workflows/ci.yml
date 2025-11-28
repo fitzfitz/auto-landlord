@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run linter
-        run: npx next lint --dir .
+        run: npx next lint
         continue-on-error: false
 
       - name: Setup environment variables for build
