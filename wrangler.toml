@@ -18,9 +18,4 @@ bucket_name = "auto-landlord"
 NODE_ENV = "production"
 NEXT_PUBLIC_APP_URL = "https://fitzgeral.my.id" # Update with your custom domain
 
-# Development environment (optional)
-[env.development]
-[[env.development.d1_databases]]
-binding = "DB"
-database_name = "auto-landlord-dev"
-database_id = "YOUR_DEV_DATABASE_ID_HERE"
+
