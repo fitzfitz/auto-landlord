@@ -1,0 +1,78 @@
+name: CI - Lint and Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    name: Lint and Build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Setup environment variables for build
+        run: |
+          echo "DATABASE_URL=file:./dev.db" >> .env.local
+          echo "CLERK_SECRET_KEY=sk_test_placeholder" >> .env.local
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_placeholder" >> .env.local
+          echo "RESEND_API_KEY=re_placeholder" >> .env.local
+          echo "NEXT_PUBLIC_APP_URL=http://localhost:3000" >> .env.local
+          echo "R2_ACCOUNT_ID=placeholder" >> .env.local
+          echo "R2_ACCESS_KEY_ID=placeholder" >> .env.local
+          echo "R2_SECRET_ACCESS_KEY=placeholder" >> .env.local
+          echo "R2_BUCKET_NAME=placeholder" >> .env.local
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Run type check
+        run: npx tsc --noEmit
+
+      - name: Comment PR with build status
+        if: github.event_name == 'pull_request' && success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Build successful! All checks passed. Ready for review.'
+            })
+
+      - name: Comment PR with build failure
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Build failed. Please check the logs and fix the errors before merging.'
+            })
