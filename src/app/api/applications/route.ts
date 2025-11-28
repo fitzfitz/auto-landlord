@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create application
-    const application = await prisma.application.create({
+    await prisma.application.create({
       data: {
         propertyId,
         name,

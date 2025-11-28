@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;
   const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
   const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
@@ -64,13 +64,13 @@ export async function GET(request: NextRequest) {
       bucket: R2_BUCKET_NAME,
       publicUrl: R2_PUBLIC_URL,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("R2 Connection Error:", error);
     return NextResponse.json(
       {
         status: "error",
         message: "Failed to connect to R2",
-        details: error.message,
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

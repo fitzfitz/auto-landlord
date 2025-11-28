@@ -4,7 +4,20 @@ import { Eye, EyeOff, Trash2 } from "lucide-react";
 import { updateStatus } from "./actions";
 
 interface ApplicationCardProps {
-  application: any; // Using any for now to match previous code, ideally should be typed
+  application: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    message: string | null;
+    status: string;
+    createdAt: Date;
+    property: {
+      address: string;
+      city: string;
+      state: string;
+    };
+  };
   statusColors: Record<string, string>;
 }
 

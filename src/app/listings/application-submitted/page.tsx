@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function ApplicationSubmitted() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -26,12 +28,12 @@ export default function ApplicationSubmitted() {
           application and contact you soon.
         </p>
 
-        <a
+        <Link
           href="/"
           className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800"
         >
           Return to Home
-        </a>
+        </Link>
       </div>
     </div>
   );
