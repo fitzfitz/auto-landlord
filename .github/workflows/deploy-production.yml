@@ -1,51 +1,67 @@
-steps:
-  - name: Checkout code
-    uses: actions/checkout@v4
+name: Deploy to Production
 
-  - name: Setup Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: "20"
-      cache: "npm"
+on:
+  push:
+    tags:
+      - "release-v*" # Triggers on tags like release-v1.0.0
 
-  - name: Install dependencies
-    run: npm ci
+permissions:
+  contents: read
+  deployments: write
 
-  - name: Setup environment variables
-    run: |
-      echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
-      echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env.local
-      echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
-      echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
-      echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env.local
-      echo "R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}" >> .env.local
-      echo "R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}" >> .env.local
-      echo "R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}" >> .env.local
-      echo "R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" >> .env.local
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages (Production)
 
-  - name: Build application
-    run: npm run build
-    env:
-      NODE_ENV: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  - name: Deploy to Cloudflare Pages
-    uses: cloudflare/pages-action@v1
-    with:
-      apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      projectName: auto-landlord
-      directory: .next
-      gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-      branch: production
-      wranglerVersion: "3"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
-  - name: Run database migrations
-    run: npx prisma migrate deploy
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Install dependencies
+        run: npm ci
 
-  - name: Notify deployment success
-    if: success()
-    run: |
-      echo "✅ Deployment to production successful!"
-      echo "🚀 Version: ${{ github.ref_name }}"
+      - name: Setup environment variables
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
+          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
+          echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env.local
+          echo "R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}" >> .env.local
+          echo "R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}" >> .env.local
+          echo "R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}" >> .env.local
+          echo "R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" >> .env.local
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: auto-landlord
+          directory: .next
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: production
+          wranglerVersion: "3"
+
+      - name: Run database migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ Deployment to production successful!"
+          echo "🚀 Version: ${{ github.ref_name }}"
