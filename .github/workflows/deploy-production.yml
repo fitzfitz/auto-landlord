@@ -51,7 +51,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: auto-landlord
-          directory: .vercel/output/static
+          directory: .open-next/assets
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: production
           wranglerVersion: "3"
