@@ -49,6 +49,7 @@ jobs:
           directory: .next
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: production
+          wranglerVersion: "3"
 
       - name: Run database migrations
         run: npx prisma migrate deploy
