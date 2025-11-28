@@ -50,3 +50,9 @@ prisma/*.db
 prisma/*.db-journal
 dev.db
 dev.db-journal
+
+# OpenNext build output
+.open-next/
+
+# Wrangler
+.wrangler/

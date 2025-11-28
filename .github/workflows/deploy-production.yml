@@ -12,7 +12,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy to Cloudflare Pages (Production)
+    name: Deploy to Cloudflare Workers (Production)
 
     steps:
       - name: Checkout code
@@ -45,16 +45,10 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: auto-landlord
-          directory: .open-next/assets
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: production
-          wranglerVersion: "3"
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: Run database migrations
         run: npx prisma migrate deploy

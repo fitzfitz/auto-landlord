@@ -1,21 +1,24 @@
 name = "auto-landlord"
+main = ".open-next/worker.js"
 compatibility_date = "2024-01-01"
-pages_build_output_dir = ".open-next/assets"
+compatibility_flags = ["nodejs_compat"]
 
 # Cloudflare D1 Database (Production)
 [[d1_databases]]
 binding = "DB"
 database_name = "auto-landlord-db"
-database_id = "5dfcf091-d371-492d-9d55-8cdbfc449b4d" # Replace with actual ID from: npx wrangler d1 create auto-landlord-db
+database_id = "5dfcf091-d371-492d-9d55-8cdbfc449b4d"
 
 # Cloudflare R2 Storage (Production)
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "auto-landlord"
 
-# Environment Variables
-[env.production.vars]
+# R2 Bucket for Incremental Cache (required by OpenNext)
+[[r2_buckets]]
+binding = "NEXT_CACHE_WORKERS_KV"
+bucket_name = "auto-landlord-cache"
+
+[vars]
 NODE_ENV = "production"
-NEXT_PUBLIC_APP_URL = "https://auto-landlord.fitzgeral.my.id" # Update with your custom domain
-
-
+NEXT_PUBLIC_APP_URL = "https://auto-landlord.fitzgeral.my.id"
