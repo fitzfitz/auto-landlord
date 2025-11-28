@@ -32,15 +32,15 @@ jobs:
 
       - name: Setup environment variables for build
         run: |
-          echo "DATABASE_URL=file:./dev.db" >> .env.local
-          echo "CLERK_SECRET_KEY=sk_test_placeholder" >> .env.local
-          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_placeholder" >> .env.local
-          echo "RESEND_API_KEY=re_placeholder" >> .env.local
-          echo "NEXT_PUBLIC_APP_URL=http://localhost:3000" >> .env.local
-          echo "R2_ACCOUNT_ID=placeholder" >> .env.local
-          echo "R2_ACCESS_KEY_ID=placeholder" >> .env.local
-          echo "R2_SECRET_ACCESS_KEY=placeholder" >> .env.local
-          echo "R2_BUCKET_NAME=placeholder" >> .env.local
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
+          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
+          echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env.local
+          echo "R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}" >> .env.local
+          echo "R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}" >> .env.local
+          echo "R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}" >> .env.local
+          echo "R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" >> .env.local
 
       - name: Generate Prisma Client
         run: npx prisma generate
