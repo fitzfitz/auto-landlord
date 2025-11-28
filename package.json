@@ -16,7 +16,8 @@
     "wrangler:login": "npx wrangler login",
     "wrangler:d1:create": "npx wrangler d1 create auto-landlord-db",
     "wrangler:d1:migrate": "npx wrangler d1 execute auto-landlord-db --file=./prisma/migrations/init.sql",
-    "wrangler:deploy": "npx wrangler pages deploy .next --branch=production",
+    "wrangler:deploy": "npx wrangler pages deploy .vercel/output/static --branch=production",
+    "pages:build": "npx @cloudflare/next-on-pages",
     "promote-admin": "node scripts/promote-admin.js"
   },
   "prisma": {
@@ -38,6 +39,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

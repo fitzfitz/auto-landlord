@@ -41,7 +41,7 @@ jobs:
           echo "R2_PUBLIC_URL=${{ secrets.R2_PUBLIC_URL }}" >> .env.local
 
       - name: Build application
-        run: npm run build
+        run: npm run pages:build
         env:
           NODE_ENV: production
 
@@ -51,7 +51,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: auto-landlord
-          directory: .next
+          directory: .vercel/output/static
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: production
           wranglerVersion: "3"
