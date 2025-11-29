@@ -1,10 +1,8 @@
 import { getOrCreateUser } from "@/lib/auth";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import TicketStatusDropdown from "@/components/ticket-status-dropdown";
-
-const prisma = new PrismaClient();
 
 export default async function TicketDetailPage({
   params,

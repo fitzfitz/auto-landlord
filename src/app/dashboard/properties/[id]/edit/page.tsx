@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getOrCreateUser } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PropertyForm } from "@/components/property-form";
-
-const prisma = new PrismaClient();
 
 export default async function EditPropertyPage({
   params,

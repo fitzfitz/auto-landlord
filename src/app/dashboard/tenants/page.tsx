@@ -1,10 +1,8 @@
 import { getOrCreateUser } from "@/lib/auth";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { ResendButton } from "@/components/resend-button";
-
-const prisma = new PrismaClient();
 
 export default async function TenantsPage() {
   const user = await getOrCreateUser();

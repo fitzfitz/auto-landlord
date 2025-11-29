@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getOrCreateUser } from "@/lib/auth";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import ApplicationCard from "./application-card";
-
-const prisma = new PrismaClient();
 
 export default async function ApplicationsPage() {
   const user = await getOrCreateUser();

@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { MapPin, Bed, Bath, DollarSign, Mail } from "lucide-react";
-
-const prisma = new PrismaClient();
 
 export default async function PropertyListingPage({
   params,

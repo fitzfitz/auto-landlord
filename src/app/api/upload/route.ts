@@ -6,9 +6,7 @@ import {
   type ImageFile,
 } from "@/lib/image-compression";
 import { uploadMultipleToR2 } from "@/lib/r2-upload";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 const MAX_FILES = 10;
 const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];

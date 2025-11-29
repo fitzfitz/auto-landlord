@@ -1,10 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 import { getOrCreateUser } from "@/lib/auth";
-
-const prisma = new PrismaClient();
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
