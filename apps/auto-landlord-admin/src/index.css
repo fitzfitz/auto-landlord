@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* 1. YOUR THEME CONFIGURATION */
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-900: #1e3a8a;
+
+  --background-image-glass: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  --background-image-glass-hover: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  --background-image-dark-gradient: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #1e293b 100%
+  );
+
+  --backdrop-blur-glass: 20px;
+}
+
+/* 2. YOUR CUSTOM LAYERS */
+@layer base {
+  body {
+    /* Works because 'bg-dark-gradient' is generated from the theme variables above */
+    @apply bg-dark-gradient text-white min-h-screen;
+    /* Reset margin/padding is handled by Tailwind automatically, but you can add font-family here if needed */
+  }
+}
+
+@layer components {
+  /* Define the shared glass styles */
+  .glass-panel {
+    @apply backdrop-blur-glass bg-glass border border-white/10 shadow-xl;
+  }
+
+  .glass-card {
+    /* NOTE: We repeat the glass-panel utilities here because 
+      you cannot '@apply glass-panel' directly in CSS. 
+    */
+    @apply backdrop-blur-glass bg-glass border border-white/10 shadow-xl;
+    @apply rounded-2xl p-6 transition-all duration-300 hover:bg-glass-hover;
+  }
+
+  .glass-button {
+    @apply backdrop-blur-glass bg-glass border border-white/10 shadow-xl;
+    @apply px-4 py-2 rounded-lg font-medium transition-all hover:bg-white/20 active:scale-95;
+  }
+}

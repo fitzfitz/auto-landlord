@@ -1,0 +1,35 @@
+
+> auto-landlord-admin@0.0.0 lint D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin
+> eslint .
+
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\components\Glass.tsx
+  13:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\features\properties\PropertyForm.tsx
+  64:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\features\properties\PropertySidebar.tsx
+   67:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  161:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\features\properties\index.tsx
+  82:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\features\properties\usePropertyMutations.ts
+  88:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\lib\sanitize.test.ts
+  3:3  warning  'sanitize' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin\src\lib\sanitize.ts
+  133:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 14 problems (0 errors, 14 warnings)
+

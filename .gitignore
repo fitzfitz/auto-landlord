@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -14,7 +14,7 @@
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
@@ -40,6 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+cloudflare-env.d.ts
 
 /src/generated/prisma
 
@@ -56,3 +57,15 @@ dev.db-journal
 
 # Wrangler
 .wrangler/
+
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+.turbo/
+.wrangler/
+
+dist/
+.svelte-kit/ 
+.cache/ 
+.parcel-cache/

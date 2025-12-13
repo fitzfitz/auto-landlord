@@ -1,0 +1,46 @@
+{
+  "name": "auto-landlord-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "auto-landlord-db",
+      "database_id": "5dfcf091-d371-492d-9d55-8cdbfc449b4d",
+      "migrations_dir": "../../packages/shared/drizzle"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "auto-landlord"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CONFIG",
+      "id": "08dbcca0858341409597746bc84d275c"
+    },
+    {
+      "binding": "SESSIONS",
+      "id": "66286be5af4f49cabd900379ebcd637f"
+    },
+    {
+      "binding": "RATE_LIMITS",
+      "id": "8e02609b7bc44764805954e994c4d319"
+    },
+    {
+      "binding": "PROPERTY_CACHE",
+      "id": "ee0814ec5cd246e290b54c03fe4c2dbe"
+    },
+    {
+      "binding": "USER_CACHE",
+      "id": "370c56e761ac4254a9b8a6617d64b2af"
+    },
+    {
+      "binding": "LISTING_SLUGS",
+      "id": "19c4cdaf7910487bb30da159fd256464"
+    }
+  ]
+}

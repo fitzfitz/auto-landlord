@@ -1,107 +1,143 @@
 #!/bin/bash
+# Auto Landlord - Development Setup Script (macOS/Linux)
+# This script sets up the development environment
 
-# AutoLandlord - Team Setup Script
-# This script sets up the local development environment with SQLite database and sample data
+set -e
 
-echo "🚀 AutoLandlord - Development Setup"
-echo "===================================="
+echo "🚀 Auto Landlord - Development Setup"
+echo "======================================"
 echo ""
 
-# Check if Node.js is installed
-if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is not installed. Please install Node.js 20 or higher."
+# Colors
+RED='\033[0:31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if pnpm is installed
+if ! command -v pnpm &> /dev/null; then
+    echo -e "${RED}❌ pnpm is not installed${NC}"
+    echo "Install with: npm install -g pnpm"
     exit 1
 fi
 
-echo "✅ Node.js version: $(node --version)"
+echo "✅ pnpm found"
+
+# Check if wrangler is installed
+if ! command -v wrangler &> /dev/null; then
+    echo -e "${YELLOW}⚠️  wrangler not found, installing...${NC}"
+    pnpm add -g wrangler
+fi
+
+echo "✅ wrangler found"
 echo ""
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install
-
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to install dependencies"
-    exit 1
-fi
-
+pnpm install
 echo "✅ Dependencies installed"
 echo ""
 
-# Setup environment file
-if [ ! -f ".env" ]; then
-    echo "⚙️  Creating .env file from .env.example..."
-    if [ -f ".env.example" ]; then
-        cp .env.example .env
-        echo "✅ .env file created"
-        echo "⚠️  Please update .env with your actual credentials"
-    else
-        echo "⚠️  No .env.example found. Creating minimal .env..."
-        cat > .env << EOL
-DATABASE_URL="file:./dev.db"
-CLERK_SECRET_KEY="your_clerk_secret_key"
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
-RESEND_API_KEY="your_resend_api_key"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-R2_ACCOUNT_ID="your_r2_account_id"
-R2_ACCESS_KEY_ID="your_r2_access_key"
-R2_SECRET_ACCESS_KEY="your_r2_secret_key"
-R2_BUCKET_NAME="auto-landlord-images"
-EOL
-        echo "✅ Minimal .env created"
-        echo "⚠️  Please update .env with your actual credentials"
-    fi
-else
-    echo "ℹ️  .env file already exists, skipping..."
+# Check for environment files
+echo "🔍 Checking environment configuration..."
+
+ENV_MISSING=0
+
+if [ ! -f "apps/auto-landlord-admin/.env" ]; then
+    echo -e "${YELLOW}⚠️  apps/auto-landlord-admin/.env missing${NC}"
+    ENV_MISSING=1
 fi
 
-echo ""
+if [ ! -f "packages/shared/.env" ]; then
+    echo -e "${YELLOW}⚠️  packages/shared/.env missing${NC}"
+    ENV_MISSING=1
+fi
 
-# Generate Prisma Client
-echo "🔧 Generating Prisma Client..."
-npx prisma generate
-
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to generate Prisma Client"
+if [ $ENV_MISSING -eq 1 ]; then
+    echo ""
+    echo -e "${RED}❌ Environment files missing!${NC}"
+    echo ""
+    echo "Please create the following files:"
+    echo ""
+    echo "1. apps/auto-landlord-admin/.env"
+    echo "   VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxxxx"
+    echo "   VITE_API_URL=http://localhost:8787/api"
+    echo ""
+    echo "2. packages/shared/.env"
+    echo "   CLOUDFLARE_ACCOUNT_ID=your_account_id"
+    echo "   CLOUDFLARE_API_TOKEN=your_api_token"
+    echo ""
+    echo "Get Clerk keys from: https://dashboard.clerk.com"
+    echo "Get Cloudflare credentials from: https://dash.cloudflare.com"
+    echo ""
     exit 1
 fi
 
-echo "✅ Prisma Client generated"
+echo "✅ Environment files found"
 echo ""
 
-# Run database migrations
-echo "🗄️  Running database migrations..."
-npx prisma migrate dev --name init
-
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to run migrations"
-    exit 1
+# Check if logged into wrangler
+echo "🔐 Checking Cloudflare authentication..."
+if ! wrangler whoami &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Not logged into Cloudflare${NC}"
+    echo "Running: wrangler login"
+    wrangler login
 fi
 
-echo "✅ Migrations completed"
+echo "✅ Cloudflare authenticated"
+echo ""
+
+# Check if database exists
+echo "🗄️  Checking D1 database..."
+DB_EXISTS=$(wrangler d1 list | grep "auto-landlord-db" || echo "")
+
+if [ -z "$DB_EXISTS" ]; then
+    echo -e "${YELLOW}⚠️  Database doesn't exist, creating...${NC}"
+    wrangler d1 create auto-landlord-db
+    echo ""
+    echo -e "${RED}⚠️  IMPORTANT: Update apps/auto-landlord-api/wrangler.json${NC}"
+    echo "   Replace the database_id with the one shown above"
+    echo ""
+    read -p "Press enter once you've updated wrangler.json..."
+fi
+
+echo "✅ Database exists"
+echo ""
+
+# Run migrations
+echo "🔄 Running database migrations..."
+cd packages/shared
+pnpm drizzle-kit generate
+pnpm drizzle-kit migrate
+cd ../..
+
+echo "✅ Migrations complete"
 echo ""
 
 # Seed database
-echo "🌱 Seeding database with sample data..."
-npm run seed
-
-if [ $? -ne 0 ]; then
-    echo "❌ Failed to seed database"
-    exit 1
+echo "🌱 Seeding database..."
+if [ -f "scripts/seed.sql" ]; then
+    wrangler d1 execute auto-landlord-db --local --file=scripts/seed.sql
+    echo "✅ Database seeded"
+else
+    echo -e "${YELLOW}⚠️  Seed file not found, skipping...${NC}"
 fi
 
-echo "✅ Database seeded"
 echo ""
-
-# Final instructions
-echo "✅ Setup Complete!"
+echo "✨ Setup complete!"
 echo ""
 echo "Next steps:"
-echo "1. Update .env file with your actual credentials"
-echo "2. Run 'npm run dev' to start the development server"
+echo "1. Set Cloudflare secrets:"
+echo "   cd apps/auto-landlord-api"
+echo "   npx wrangler secret put CLERK_PUBLISHABLE_KEY"
+echo "   npx wrangler secret put CLERK_SECRET_KEY"
 echo ""
-echo "Demo accounts:"
-echo "  Landlord: landlord@demo.com"
-echo "  Tenant: tenant@demo.com"
+echo "2. Start development:"
+echo "   pnpm dev"
 echo ""
-echo "Happy coding! 🎉"
+echo "3. Open:"
+echo "   - Admin: http://localhost:5173"
+echo "   - API: http://localhost:8787"
+echo "   - Landing: http://localhost:3000"
+echo ""
+

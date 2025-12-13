@@ -1,0 +1,24 @@
+
+> auto-landlord-api@0.0.0 lint D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-api
+> eslint .
+
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-api\src\features\upload\index.ts
+  58:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-api\src\features\upload\upload.test.ts
+   7:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   7:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:13  warning  'c' is defined but never used             @typescript-eslint/no-unused-vars
+  14:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-api\src\routes\health.ts
+  16:11  warning  'result' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 11 problems (0 errors, 11 warnings)
+

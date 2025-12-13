@@ -1,0 +1,16 @@
+
+> auto-landlord-admin@0.0.0 test D:\Fitz\Project\frontendweb_react_tnlm\.other\refactor\apps\auto-landlord-admin
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mD:/Fitz/Project/frontendweb_react_tnlm/.other/refactor/apps/auto-landlord-admin[39m
+
+ [32m✓[39m src/store/ui.store.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/lib/utils.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m src/lib/sanitize.test.ts [2m([22m[2m35 tests[22m[2m)[22m[32m 113[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[32m43 passed[39m[22m[90m (43)[39m
+[2m   Start at [22m 15:05:51
+[2m   Duration [22m 3.15s[2m (transform 178ms, setup 588ms, collect 279ms, tests 140ms, environment 5.30s, prepare 896ms)[22m
+

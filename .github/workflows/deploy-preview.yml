@@ -1,0 +1,78 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    name: Deploy Previews
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build All
+        run: pnpm turbo run build
+        env:
+          NEXT_PUBLIC_API_URL: "https://api-preview.auto-landlord.fitzgeral.my.id" # Example preview URL logic
+          VITE_API_URL: "https://api-preview.auto-landlord.fitzgeral.my.id"
+
+      # Deploy Admin App (Vite -> Cloudflare Pages)
+      - name: Deploy Admin to Cloudflare Pages
+        id: deploy-admin
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: "auto-landlord-admin"
+          directory: "apps/auto-landlord-admin/dist"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+          workingDirectory: "apps/auto-landlord-admin"
+
+      # Deploy Landing App (Next.js -> Cloudflare Pages via OpenNext)
+      - name: Deploy Landing to Cloudflare Pages
+        id: deploy-landing
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: "auto-landlord-landing"
+          directory: "apps/auto-landlord-landing/.open-next/assets"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+          workingDirectory: "apps/auto-landlord-landing"
+
+      - name: Comment PR with Preview URLs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const adminUrl = '${{ steps.deploy-admin.outputs.url }}';
+            const landingUrl = '${{ steps.deploy-landing.outputs.url }}';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Preview Deployments Ready!**\n\n- **Admin Dashboard**: [${adminUrl}](${adminUrl})\n- **Marketing Site**: [${landingUrl}](${landingUrl})`
+            })

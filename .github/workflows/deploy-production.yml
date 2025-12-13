@@ -1,62 +1,100 @@
-name: Deploy to Production
+name: Deploy Production
 
 on:
   push:
     tags:
-      - "release-v*" # Triggers on tags like release-v1.0.0
-
-permissions:
-  contents: read
-  deployments: write
+      - "release-v*"
 
 jobs:
-  deploy:
+  deploy-production:
     runs-on: ubuntu-latest
-    name: Deploy to Cloudflare Workers (Production)
+    name: Deploy to Production
+    permissions:
+      contents: read
+      deployments: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
-      - name: Setup environment variables
+      - name: Setup Environment Variables
         run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.local
-          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env.local
-          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
-          echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.local
-          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env.local
-          echo "R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}" >> .env.local
-          echo "R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}" >> .env.local
-          echo "R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}" >> .env.local
-          echo "R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" >> .env.local
-          echo "R2_PUBLIC_URL=${{ secrets.R2_PUBLIC_URL }}" >> .env.local
+          # Create .env files if needed by build scripts or migrations
+          # In turbo monorepo, usually env vars are passed to build command or loaded from CI env
+          echo "Setting up env vars..."
 
-      - name: Build application
-        run: npm run pages:build
+      - name: Build All Apps
+        run: pnpm turbo run build
         env:
           NODE_ENV: production
+          NEXT_PUBLIC_APP_URL: "https://auto-landlord.com"
+          VITE_API_URL: "https://api.auto-landlord.com"
+          NEXT_PUBLIC_API_URL: "https://api.auto-landlord.com"
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
-      - name: Deploy to Cloudflare Workers
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # 1. Deploy API (Workers)
+      - name: Deploy API
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: "apps/auto-landlord-api"
+          command: deploy src/index.ts --name auto-landlord-api --env production
 
-      - name: Run database migrations
-        run: npx prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # 2. Deploy Admin (Pages)
+      - name: Deploy Admin App
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: "auto-landlord-admin"
+          directory: "dist"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: "main"
+          workingDirectory: "apps/auto-landlord-admin"
 
-      - name: Notify deployment success
+      # 3. Deploy Landing (Pages)
+      - name: Deploy Landing App
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: "auto-landlord-landing"
+          directory: ".open-next/assets"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: "main"
+          workingDirectory: "apps/auto-landlord-landing"
+
+      # 4. Run Drizzle Migrations
+      - name: Run D1 Migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # We run migrations from root or shared? Config is in root but migrations dir is generated there
+          # D1 migrations apply usually runs from where wrangler.json is or specified config
+          # We have migrations in `drizzle/` root.
+          # We need to run this command against the `auto-landlord-api` or just use wrangler d1 directly
+          # Using root package.json script:
+          command: d1 migrations apply auto-landlord-db --remote
+          workingDirectory: "."
+
+      - name: Notify Success
         if: success()
         run: |
-          echo "✅ Deployment to production successful!"
-          echo "🚀 Version: ${{ github.ref_name }}"
+          echo "✅ Production Deployment Complete!"
